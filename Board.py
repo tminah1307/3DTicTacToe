@@ -40,7 +40,7 @@ class Board:
         # Check rows, columns, and layers 
         # Iterate through each index for each dimension
         for i in range(3):
-            if any(self.check_line(self.board[i][j], player) for j in range(3)) or \
+            if any(self.check_line(self.board[i][j], player) for i in range(3)) or \
             any(self.check_line(self.board[i][j], player) for j in range(3)) or \
             any(self.check_line([self.board[k][j][i] for k in range(3)], player) for j in range(3)):
                 return True
