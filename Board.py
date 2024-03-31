@@ -54,12 +54,7 @@ class Board:
         
     # Get available points on the board
     def get_available_points(self):
-        available_points = []
-        for x in range(3):
-            for y in range(3):
-                for z in range(3):
-                    if self.board[x][y][z] == 0:
-                        available_points.append((x, y, z))
+        available_points = [(x, y, z) for x in range(3) for y in range(3) for z in range(3) if self.board[x][y][z] == 0]
         return available_points
 
     # Get state of a specific point on the board
@@ -77,12 +72,5 @@ class Board:
         print()
         for layer in self.board:
             for row in layer:
-                for cell in row:
-                    if cell == 1:
-                        print("X", end=" ")
-                    elif cell == 2:
-                        print("O", end=" ")
-                    else:
-                        print(".", end=" ")
-                print()
+                print(" ".join(["X" if cell == 1 else "O" if cell == 2 else "." for cell in row]))
             print()
