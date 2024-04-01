@@ -36,20 +36,22 @@ class Board:
     
     # Check x, y, z coordinates for each row to validate a win
     def check_winning_conditions(self, player):
-
         # Check rows, columns, and layers 
         # Iterate through each index for each dimension
         for i in range(3):
-            if any(self.check_line(self.board[i][j], player) for i in range(3)) or \
-            any(self.check_line(self.board[i][j], player) for j in range(3)) or \
-            any(self.check_line([self.board[k][j][i] for k in range(3)], player) for j in range(3)):
+        # Check rows
+            if any(all(cell == player for cell in row) for row in self.board[i]) or \
+            any(all(self.board[j][i][k] == player for j in range(3)) for k in range(3)) or \
+            any(all(self.board[k][j][i] == player for k in range(3)) for j in range(3)):
                 return True
+            
         
         # Check diagonals across layers
         # Iterate through each diagonal dimension
-        if any(self.check_line([self.board[k][i][j] for k in range(3)], player) for j in range(3)) or \
-        any(self.check_line([self.board[k][i][2-j] for k in range(3)], player) for j in range(3)):
+        if any(all(self.board[k][i][i] == player for k in range(3)) for i in range(3)) or \
+            any(all(self.board[k][i][2-i] == player for k in range(3)) for i in range(3)):
             return True
+        
         return False
         
     # Get available points on the board
