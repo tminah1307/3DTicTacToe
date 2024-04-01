@@ -15,3 +15,12 @@ class AIPlayer:
                 best_move = move
 
         return best_move
+    
+    def expand_node(self, node):
+        # Expand the given node by adding children representing possible moves
+        available_points = self.b.get_available_points()
+        for point in available_points:
+            # Create a new child node for each available point
+            new_state = self.b.copy_state()
+            new_state.place_a_move(point, 1)  # Assuming it's AI's turn
+            node.children[point] = TreeNode(new_state)
