@@ -45,7 +45,6 @@ class Board:
             any(all(self.board[k][j][i] == player for k in range(3)) for j in range(3)):
                 return True
             
-        
         # Check diagonals across layers
         # Iterate through each diagonal dimension
         if any(all(self.board[k][i][i] == player for k in range(3)) for i in range(3)) or \
@@ -56,8 +55,7 @@ class Board:
         
     # Get available points on the board
     def get_available_points(self):
-        available_points = [(x, y, z) for x in range(3) for y in range(3) for z in range(3) if self.board[x][y][z] == 0]
-        return available_points
+        return [(x, y, z) for x in range(3) for y in range(3) for z in range(3) if self.board[x][y][z] == 0]
 
     # Get state of a specific point on the board
     def get_state(self, point):
