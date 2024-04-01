@@ -24,3 +24,10 @@ class AIPlayer:
             new_state = self.b.copy_state()
             new_state.place_a_move(point, 1)  # Assuming it's AI's turn
             node.children[point] = TreeNode(new_state)
+    
+    def rollout(self, node):
+        # Perform a fixed-depth minimax search for rollout from the given node
+        depth = 1
+        alpha = float("-inf")
+        beta = float("inf")
+        return self.minimax(depth, 2, node.state, alpha, beta)  # Assuming it's opponent's turn
