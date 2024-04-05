@@ -61,3 +61,25 @@ class AIPlayer:
         exploitation_term = node.score / node.visits if node.visits > 0 else 0
         exploration_term = exploration_factor * (math.sqrt(math.log(self.root.visits) / node.visits))
         return exploitation_term + exploration_term
+    
+    def perform_mcts(self, b):
+        self.b = b
+        if self.root is None:
+            # Initialise the root node with the current game state
+            self.root = TreeNode(b.copy_state())
+
+        # Perform MCTS with Minimax Rollouts
+        for _ in range(1000):  # Perform 1000 iterations (can be adjusted)
+            selected_node = self.select_node_to_expand(self.root)
+            self.expand_node(selected_node)
+            rollout_node = self.select_best_child(selected_node)
+            rollout_result = self.rollout(rollout_node)
+            self.backpropagate(rollout_node, rollout_result)
+
+        # Select the best move based on the UCB scores of the root's children
+        best_move = self.return_best_move()
+        # Update the tree structure based on the chosen move
+        self.update_tree(best_move)
+        return best_move
+
+    
