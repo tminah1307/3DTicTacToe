@@ -96,7 +96,7 @@ class AIPlayer:
             node.visits += 1
             node.score += score
             node = node.parent
-            
+
     def select_node_to_expand(self, node):
         # Traverse the tree to select a node for expansion
         while len(node.children) > 0:
@@ -105,3 +105,51 @@ class AIPlayer:
             else:
                 node = self.select_best_child(node)
         return node
+
+    def minimax(self, depth, turn, state, alpha, beta):
+        # Base case: Check if the game has ended or if maximum depth is reached
+        if state.is_game_over() or depth == self.MAX_DEPTH:
+            # Evaluate the state and return its score
+            if state.has_x_won():
+                return 1
+            elif state.has_o_won():
+                return -1
+            else:
+                return 0
+
+        # If it's AI's turn (MAX player)
+        if turn == 2:
+            max_score = float("-inf")
+            # Iterate over possible moves
+            for move in state.possible_moves():
+                # Make the move
+                state.place_a_move(move, turn)
+                # Recursively call minimax to find the best move
+                score = self.minimax(depth + 1, 1, state, alpha, beta)
+                # Undo the move
+                state.undo_last_move(move)
+                # Update alpha
+                max_score = max(max_score, score)
+                alpha = max(alpha, score)
+                # Perform alpha-beta pruning
+                if beta <= alpha:
+                    break
+            return max_score
+        # If it's opponent's turn (MIN player)
+        else:
+            min_score = float("inf")
+            # Iterate over possible moves
+            for move in state.possible_moves():
+                # Make the move
+                state.place_a_move(move, turn)
+                # Recursively call minimax to find the best move
+                score = self.minimax(depth + 1, 2, state, alpha, beta)
+                # Undo the move
+                state.undo_last_move(move)
+                # Update beta
+                min_score = min(min_score, score)
+                beta = min(beta, score)
+                # Perform alpha-beta pruning
+                if beta <= alpha:
+                    break
+            return min_score
