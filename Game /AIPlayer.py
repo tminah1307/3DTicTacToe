@@ -6,7 +6,7 @@ class TreeNode:
         self.visits = 0
         self.score = 0
         self.children = {}
-        
+
 class AIPlayer:
     def __init__(self):
         self.root = None
@@ -90,4 +90,18 @@ class AIPlayer:
         self.update_tree(best_move)
         return best_move
 
-    
+    def backpropagate(self, node, score):
+        # Backpropagate the rollout result up the tree
+        while node is not None:
+            node.visits += 1
+            node.score += score
+            node = node.parent
+            
+    def select_node_to_expand(self, node):
+        # Traverse the tree to select a node for expansion
+        while len(node.children) > 0:
+            if node.visits == 0:
+                return node
+            else:
+                node = self.select_best_child(node)
+        return node
