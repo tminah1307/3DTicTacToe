@@ -1,11 +1,12 @@
-import math as math
+import math
 
 class TreeNode:
-    def __init__(self, state):
+    def __init__(self, state, parent=None):
         self.state = state
         self.visits = 0
         self.score = 0
         self.children = {}
+        self.parent = parent
 
 class AIPlayer:
     def __init__(self):
@@ -24,7 +25,7 @@ class AIPlayer:
                 best_move = move
 
         return best_move
-    
+
     def expand_node(self, node):
         # Expand the given node by adding children representing possible moves
         available_points = self.b.get_available_points()
@@ -32,8 +33,8 @@ class AIPlayer:
             # Create a new child node for each available point
             new_state = self.b.copy_state()
             new_state.place_a_move(point, 1)  # Assuming it's AI's turn
-            node.children[point] = TreeNode(new_state)
-    
+            node.children[point] = TreeNode(new_state, node)
+
     def rollout(self, node):
         # Perform a fixed-depth minimax search for rollout from the given node
         depth = 1
@@ -45,6 +46,7 @@ class AIPlayer:
         # Update the tree structure based on the move chosen in the rollout
         if move in self.root.children:
             self.root = self.root.children[move]
+            self.root.parent = None  # Reset the parent of the new root node
         else:
             # If the move is not in the tree, create a new node for it
             new_state = self.b.copy_state()
@@ -67,9 +69,9 @@ class AIPlayer:
         # Calculate the UCB score for a given node
         exploration_factor = 1.4  # Tunable parameter
         exploitation_term = node.score / node.visits if node.visits > 0 else 0
-        exploration_term = exploration_factor * (math.sqrt(math.log(self.root.visits) / node.visits))
+        exploration_term = exploration_factor * (math.sqrt(math.log(node.parent.visits) / node.visits))
         return exploitation_term + exploration_term
-    
+
     def perform_mcts(self, b):
         self.b = b
         if self.root is None:
@@ -118,26 +120,8 @@ class AIPlayer:
                 return 0
 
         # If it's AI's turn (MAX player)
-        if turn == 2:
+        if turn == 1:
             max_score = float("-inf")
-            # Iterate over possible moves
-            for move in state.possible_moves():
-                # Make the move
-                state.place_a_move(move, turn)
-                # Recursively call minimax to find the best move
-                score = self.minimax(depth + 1, 1, state, alpha, beta)
-                # Undo the move
-                state.undo_last_move(move)
-                # Update alpha
-                max_score = max(max_score, score)
-                alpha = max(alpha, score)
-                # Perform alpha-beta pruning
-                if beta <= alpha:
-                    break
-            return max_score
-        # If it's opponent's turn (MIN player)
-        else:
-            min_score = float("inf")
             # Iterate over possible moves
             for move in state.possible_moves():
                 # Make the move
@@ -146,10 +130,25 @@ class AIPlayer:
                 score = self.minimax(depth + 1, 2, state, alpha, beta)
                 # Undo the move
                 state.undo_last_move(move)
+                # Update alpha
+                max_score = max(max_score, score)
+                alpha = max(alpha, score)
+                if beta <= alpha:
+                    break  # Beta cut-off
+            return max_score
+        else:
+            min_score = float("inf")
+            # Iterate over possible moves
+            for move in state.possible_moves():
+                # Make the move
+                state.place_a_move(move, turn)
+                # Recursively call minimax to find the best move
+                score = self.minimax(depth + 1, 1, state, alpha, beta)
+                # Undo the move
+                state.undo_last_move(move)
                 # Update beta
                 min_score = min(min_score, score)
                 beta = min(beta, score)
-                # Perform alpha-beta pruning
                 if beta <= alpha:
-                    break
+                    break  # Alpha cut-off
             return min_score
