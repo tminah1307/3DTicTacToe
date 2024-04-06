@@ -5,5 +5,4 @@ __all__ = ['GameState', 'Board', 'Point', 'PointsAndScores', 'AIPlayer', 'TreeNo
 from .GameState import GameState
 from .Board import Board, Point, PointsAndScores
 from .AIPlayer import AIPlayer, TreeNode
-
-
+from .TicTacToe3D import TicTacToe3D
